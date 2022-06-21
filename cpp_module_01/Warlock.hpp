@@ -6,19 +6,23 @@
 /*   By: artmende <artmende@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/20 11:26:15 by artmende          #+#    #+#             */
-/*   Updated: 2022/06/21 15:11:38 by artmende         ###   ########.fr       */
+/*   Updated: 2022/06/21 16:48:09 by artmende         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-# include <iostream>
+#include <iostream>
+#include <vector>
+#include "ASpell.hpp"
+
 
 class Warlock
 {
 private:
-	std::string	_name;
-	std::string	_title;
+	std::string				_name;
+	std::string				_title;
+	std::vector<ASpell*>	_known;
 
 	Warlock() {}
 	Warlock(Warlock const & x);
@@ -32,6 +36,10 @@ public:
 	~Warlock()
 	{
 		std::cout << this->_name << ": My job here is done!" << std::endl;
+		for(size_t i = 0; i < _known.size(); ++i)
+		{
+			delete (_known[i]);
+		}
 	}
 
 	std::string const &	getName() const { return (this->_name); }
@@ -42,5 +50,44 @@ public:
 	void	introduce() const
 	{
 		std::cout << this->_name << ": I am " << this->_name << ", " << this->_title << "!" << std::endl;
+	}
+
+	void	learnSpell(ASpell* spell)
+	{
+		if (spell == NULL)
+			return ;
+		for(size_t i = 0; i < _known.size(); ++i)
+		{
+			if (_known[i] && _known[i]->getName() == spell->getName())
+			{
+				delete spell;
+				return ;
+			}
+		}
+		_known.push_back(spell);
+	}
+
+	void	forgetSpell(std::string spell)
+	{
+		for(size_t i = 0; i < _known.size(); ++i)
+		{
+			if (_known[i] && _known[i]->getName() == spell)
+			{
+				delete (_known[i]);
+				_known[i] = NULL;
+			}
+		}
+	}
+
+	void	launchSpell(std::string spell, ATarget const & target) const
+	{
+		for(size_t i = 0; i < _known.size(); ++i)
+		{
+			if (_known[i] && _known[i]->getName() == spell)
+			{
+				_known[i]->launch(target);
+				return ;
+			}
+		}
 	}
 };
